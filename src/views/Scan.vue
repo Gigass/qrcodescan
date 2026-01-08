@@ -32,7 +32,7 @@
       </div>
 
       <div class="roiPreview">
-        <div class="roiPreviewTitle">右上角截取预览</div>
+        <div class="roiPreviewTitle">实时预览</div>
         <canvas ref="roiPreviewCanvas" class="roiPreviewCanvas" width="180" height="180"></canvas>
       </div>
 
@@ -656,16 +656,16 @@ export default {
 
 .roiPreview {
   position: absolute;
-  right: 16px;
+  left: 16px;  /* 从右侧改为左侧 */
   top: 120px;
-  width: 120px;
+  width: 100px;  /* 从 120px 缩小到 100px */
   padding: 8px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   pointer-events: none;
   z-index: 20;
-  opacity: 0.9;
+  opacity: 0.85;  /* 降低不透明度，更低调 */
   transform: scale(0.9);
   transition: opacity 0.3s;
 }
