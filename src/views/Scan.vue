@@ -163,7 +163,7 @@ export default {
 
       const roiW = docW * (2 / 16)
       const roiH = docH * (2 / 9)
-      const roiX = docW * (13 / 16)
+      const roiX = docW * (12 / 16)  // 最佳位置：75%
       const roiY = docH * (1 / 9)
       this.roiRelRect = { x: roiX, y: roiY, width: roiW, height: roiH }
     },
