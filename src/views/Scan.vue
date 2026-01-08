@@ -12,7 +12,7 @@
     <div class="overlay">
       <div class="topBar">
         <div class="title">单据扫码</div>
-        <div class="hint">建议横屏拍摄：将单据完整对准 9:16 框，二维码在右下角 2×2 区域</div>
+        <div class="hint">建议横屏拍摄：将单据完整对准 9:16 框，二维码在右下角 1.5×1.5 区域</div>
         <div class="status" :class="{ ok: aligned, bad: !aligned }">{{ statusText }}</div>
         <div v-if="error" class="error">{{ error }}</div>
       </div>
@@ -25,13 +25,12 @@
           <div class="corner br"></div>
 
           <div class="roiFrame" :style="roiFrameStyle">
-            <div class="roiLabel">二维码区域（2×2）</div>
+            <div class="scanLine" aria-hidden="true"></div>
           </div>
         </div>
       </div>
 
       <div class="roiPreview">
-        <div class="roiPreviewTitle">右下角截取预览</div>
         <canvas ref="roiPreviewCanvas" class="roiPreviewCanvas" width="180" height="180"></canvas>
       </div>
 
@@ -63,7 +62,7 @@ export default {
       roiRelRect: { x: 0, y: 0, width: 0, height: 0 },
 
       aligned: false,
-      statusText: '未对准（请将二维码放到右下角 2×2 区域）',
+      statusText: '未对准（请将二维码放到右下角 1.5×1.5 区域）',
       alignedText: '',
 
       _resizeObserver: null,
@@ -153,10 +152,10 @@ export default {
 
       this.docRect = { x: docX, y: docY, width: docW, height: docH }
 
-      const roiW = docW * (2 / 9)
-      const roiH = docH * (2 / 16)
-      const roiX = docW * (7 / 9)
-      const roiY = docH * (14 / 16)
+      const roiW = docW * (1.5 / 9)
+      const roiH = docH * (1.5 / 16)
+      const roiX = docW * (7.5 / 9)
+      const roiY = docH * (14.5 / 16)
       this.roiRelRect = { x: roiX, y: roiY, width: roiW, height: roiH }
     },
     getRoiAbsRect() {
@@ -265,7 +264,7 @@ export default {
       if (!video) return
       video.play().catch(() => {})
       this.videoReady = true
-      this.statusText = '未对准（请将二维码放到右下角 2×2 区域）'
+      this.statusText = '未对准（请将二维码放到右下角 1.5×1.5 区域）'
       this.startLoop()
     },
     startLoop() {
@@ -358,12 +357,12 @@ export default {
         if (this._lostCount >= LOST_FRAMES) {
           this.aligned = false
           this.alignedText = ''
-          this.statusText = '未对准（请将二维码放到右下角 2×2 区域）'
+          this.statusText = '未对准（请将二维码放到右下角 1.5×1.5 区域）'
         }
         return
       }
 
-      this.statusText = '未对准（请将二维码放到右下角 2×2 区域）'
+      this.statusText = '未对准（请将二维码放到右下角 1.5×1.5 区域）'
     },
     autoCaptureIfNeeded() {
       if (this.autoCapturing) return
@@ -553,16 +552,42 @@ export default {
   box-sizing: border-box;
   border: 2px solid rgba(255, 255, 255, 0.85);
   background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
 }
-.roiLabel {
+.scanLine {
   position: absolute;
-  right: 6px;
-  top: 6px;
-  font-size: 11px;
-  padding: 4px 6px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  left: -12%;
+  right: -12%;
+  height: 4px;
+  top: -12%;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 163, 0),
+    rgba(0, 255, 163, 0.85),
+    rgba(0, 255, 163, 0)
+  );
+  box-shadow: 0 0 10px rgba(0, 255, 163, 0.55);
+  animation: scanLineMove 1.5s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes scanLineMove {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(160%);
+    opacity: 0;
+  }
 }
 .btn {
   min-width: 124px;
@@ -586,12 +611,7 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.14);
   pointer-events: none;
 }
-.roiPreviewTitle {
-  font-size: 12px;
-  font-weight: 700;
-}
 .roiPreviewCanvas {
-  margin-top: 8px;
   width: 180px;
   height: 180px;
   border-radius: 10px;
