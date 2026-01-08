@@ -12,7 +12,7 @@
     <div class="overlay">
       <div class="topBar">
         <div class="title">单据扫码</div>
-        <div class="hint">将单据完整对准 16:9 框，二维码在右上角 3×3 区域</div>
+        <div class="hint">将单据完整对准 16:9 框，二维码在右上角 2×2 区域</div>
         <div class="status" :class="{ ok: aligned, bad: !aligned }">{{ statusText }}</div>
         <div v-if="error" class="error">{{ error }}</div>
       </div>
@@ -25,7 +25,7 @@
           <div class="corner br"></div>
 
           <div class="roiFrame" :style="roiFrameStyle">
-            <div class="roiLabel">二维码区域（3×3）</div>
+            <div class="roiLabel">二维码区域（2×2）</div>
           </div>
         </div>
       </div>
@@ -67,7 +67,7 @@ export default {
       roiRelRect: { x: 0, y: 0, width: 0, height: 0 },
 
       aligned: false,
-      statusText: '未对准（请将二维码放到右上角 3×3 区域）',
+      statusText: '未对准（请将二维码放到右上角 2×2 区域）',
       alignedText: '',
 
       _resizeObserver: null,
@@ -157,10 +157,10 @@ export default {
 
       this.docRect = { x: docX, y: docY, width: docW, height: docH }
 
-      const roiW = docW * (3 / 16)
-      const roiH = docH * (3 / 9)
+      const roiW = docW * (2 / 16)
+      const roiH = docH * (2 / 9)
       const roiX = docW * (13 / 16)
-      const roiY = 0
+      const roiY = docH * (1 / 9)
       this.roiRelRect = { x: roiX, y: roiY, width: roiW, height: roiH }
     },
     getRoiAbsRect() {
@@ -269,7 +269,7 @@ export default {
       if (!video) return
       video.play().catch(() => {})
       this.videoReady = true
-      this.statusText = '未对准（请将二维码放到右上角 3×3 区域）'
+      this.statusText = '未对准（请将二维码放到右上角 2×2 区域）'
       this.startLoop()
     },
     startLoop() {
@@ -362,12 +362,12 @@ export default {
         if (this._lostCount >= LOST_FRAMES) {
           this.aligned = false
           this.alignedText = ''
-          this.statusText = '未对准（请将二维码放到右上角 3×3 区域）'
+          this.statusText = '未对准（请将二维码放到右上角 2×2 区域）'
         }
         return
       }
 
-      this.statusText = '未对准（请将二维码放到右上角 3×3 区域）'
+      this.statusText = '未对准（请将二维码放到右上角 2×2 区域）'
     },
     autoCaptureIfNeeded() {
       if (this.autoCapturing) return
