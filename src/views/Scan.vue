@@ -33,12 +33,10 @@
 
       <div class="roiPreview">
         <div class="roiPreviewTitle">实时预览</div>
-        <canvas ref="roiPreviewCanvas" class="roiPreviewCanvas" width="180" height="180"></canvas>
-      </div>
-
-      <div class="bottomBar">
-        <button class="btn" :disabled="!videoReady" @click="capture">拍照</button>
-        <button class="btn secondary" @click="restart">重启相机</button>
+        <div class="preview-container">
+          <canvas ref="roiPreviewCanvas" class="roiPreviewCanvas" width="180" height="180"></canvas>
+          <div class="preview-scan-line"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -654,75 +652,75 @@ export default {
   100% { top: 100%; opacity: 0; }
 }
 
+
 .roiPreview {
   position: absolute;
-  left: 16px;  /* 从右侧改为左侧 */
-  top: 120px;
-  width: 100px;  /* 从 120px 缩小到 100px */
-  padding: 8px;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  width: 140px;
+  padding: 12px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   pointer-events: none;
   z-index: 20;
-  opacity: 0.85;  /* 降低不透明度，更低调 */
-  transform: scale(0.9);
-  transition: opacity 0.3s;
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateX(-50%) translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(-50%) translateY(0); 
+  }
 }
 
 .roiPreviewTitle {
   font-size: 11px;
   color: #64748b;
   text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.preview-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #000;
 }
 
 .roiPreviewCanvas {
   width: 100%;
   height: auto;
-  border-radius: 8px;
-  background: #000;
+  border-radius: 12px;
   display: block;
 }
 
-/* Bottom Actions */
-.bottomBar {
-  padding: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 24px;
-  background: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 100%);
-  pointer-events: auto;
+/* 预览框内的扫描线动画 */
+.preview-scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #10b981, transparent);
+  box-shadow: 0 0 6px #10b981;
+  animation: previewScan 2.5s infinite ease-in-out;
+  pointer-events: none;
 }
 
-.btn {
-  height: 56px;
-  padding: 0 32px;
-  border-radius: 28px;
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  border: none;
-  background: #ffffff;
-  color: #0f172a;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.btn:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
-
-.btn.secondary {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.3);
-  min-width: auto;
-  padding: 0 24px;
-  height: 48px;
+@keyframes previewScan {
+  0% { top: 0; opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
 }
 
 .btn:disabled {
