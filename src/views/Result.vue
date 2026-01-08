@@ -19,7 +19,7 @@
       </div>
 
       <div class="card">
-        <div class="label">原图（整帧）</div>
+        <div class="label">原图（取景框截图）</div>
         <img class="img" :src="photoUrl" alt="document" />
       </div>
     </div>
@@ -137,4 +137,3 @@ export default {
   background: #000;
 }
 </style>
-

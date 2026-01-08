@@ -52,6 +52,9 @@ const SCAN_INTERVAL_MS = 160
 const ROI_CANVAS_SIZE = 960
 const STABLE_FRAMES = 3
 const LOST_FRAMES = 5
+const CAPTURE_FRAME_EXPAND = 1.5
+const CAPTURE_ASPECT_W = 20
+const CAPTURE_ASPECT_H = 15
 
 export default {
   name: 'Scan',
@@ -179,6 +182,30 @@ export default {
       const width = Math.min(maxX - x, abs.width + padX)
       const height = Math.min(maxY - y, abs.height + padY)
       return { x, y, width, height }
+    },
+    getCaptureAbsRectExpanded() {
+      const { width: displayW, height: displayH } = this.containerSize
+      const base = this.docRect
+      if (!displayW || !displayH || !base.width || !base.height) return null
+
+      const targetAspect = CAPTURE_ASPECT_W / CAPTURE_ASPECT_H
+      let targetW = base.width
+      let targetH = base.height
+      const baseAspect = targetW / targetH
+      if (baseAspect > targetAspect) targetH = targetW / targetAspect
+      else targetW = targetH * targetAspect
+
+      const scale = Math.min(CAPTURE_FRAME_EXPAND, displayW / targetW, displayH / targetH)
+      const cx = base.x + base.width / 2
+      const cy = base.y + base.height / 2
+      const w = targetW * scale
+      const h = targetH * scale
+
+      let x = cx - w / 2
+      let y = cy - h / 2
+      x = Math.max(0, Math.min(displayW - w, x))
+      y = Math.max(0, Math.min(displayH - h, y))
+      return { x, y, width: w, height: h }
     },
     preprocessToBinary(imageData) {
       const { data, width, height } = imageData
@@ -385,11 +412,22 @@ export default {
       const video = this.$refs.video
       if (!video || !video.videoWidth || !video.videoHeight) return
 
+      this.computeRects()
       const fullCanvas = document.createElement('canvas')
       fullCanvas.width = video.videoWidth
       fullCanvas.height = video.videoHeight
       const fullCtx = fullCanvas.getContext('2d')
       fullCtx.drawImage(video, 0, 0)
+
+      const captureAbsRect = this.getCaptureAbsRectExpanded() || this.docRect
+      const captureVideoRect = mapDisplayRectToVideoRectCover({
+        displayRect: captureAbsRect,
+        displayWidth: this.containerSize.width,
+        displayHeight: this.containerSize.height,
+        videoWidth: video.videoWidth,
+        videoHeight: video.videoHeight,
+      })
+      if (!captureVideoRect) return
 
       const roiVideoRect =
         this._lastRoiVideoRect ||
@@ -403,7 +441,23 @@ export default {
 
       const qrText = this.decodeFromFullCanvas(fullCtx, roiVideoRect) || this.alignedText
 
-      fullCanvas.toBlob(
+      const captureCanvas = document.createElement('canvas')
+      captureCanvas.width = Math.max(1, Math.round(captureVideoRect.width))
+      captureCanvas.height = Math.max(1, Math.round(captureVideoRect.height))
+      const captureCtx = captureCanvas.getContext('2d')
+      captureCtx.drawImage(
+        video,
+        captureVideoRect.x,
+        captureVideoRect.y,
+        captureVideoRect.width,
+        captureVideoRect.height,
+        0,
+        0,
+        captureCanvas.width,
+        captureCanvas.height
+      )
+
+      captureCanvas.toBlob(
         (blob) => {
           if (!blob) {
             this.autoCapturing = false
