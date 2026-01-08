@@ -12,7 +12,7 @@
     <div class="overlay">
       <div class="topBar">
         <div class="title">单据扫码</div>
-        <div class="hint">将单据完整对准 16:9 框，二维码在右上角 3×3 区域</div>
+        <div class="hint">建议横屏拍摄：将单据完整对准 9:16 框，二维码在右下角 3×3 区域</div>
         <div class="status" :class="{ ok: aligned, bad: !aligned }">{{ statusText }}</div>
         <div v-if="error" class="error">{{ error }}</div>
       </div>
@@ -31,7 +31,7 @@
       </div>
 
       <div class="roiPreview">
-        <div class="roiPreviewTitle">右上角截取预览</div>
+        <div class="roiPreviewTitle">右下角截取预览</div>
         <canvas ref="roiPreviewCanvas" class="roiPreviewCanvas" width="180" height="180"></canvas>
       </div>
 
@@ -67,7 +67,7 @@ export default {
       roiRelRect: { x: 0, y: 0, width: 0, height: 0 },
 
       aligned: false,
-      statusText: '未对准（请将二维码放到右上角 3×3 区域）',
+      statusText: '未对准（请将二维码放到右下角 3×3 区域）',
       alignedText: '',
 
       _resizeObserver: null,
@@ -146,10 +146,10 @@ export default {
       const maxH = ch * 0.72
 
       let docW = maxW
-      let docH = (docW * 9) / 16
+      let docH = (docW * 16) / 9
       if (docH > maxH) {
         docH = maxH
-        docW = (docH * 16) / 9
+        docW = (docH * 9) / 16
       }
 
       const docX = (cw - docW) / 2
@@ -157,10 +157,10 @@ export default {
 
       this.docRect = { x: docX, y: docY, width: docW, height: docH }
 
-      const roiW = docW * (3 / 16)
-      const roiH = docH * (3 / 9)
-      const roiX = docW * (13 / 16)
-      const roiY = 0
+      const roiW = docW * (3 / 9)
+      const roiH = docH * (3 / 16)
+      const roiX = docW * (6 / 9)
+      const roiY = docH * (13 / 16)
       this.roiRelRect = { x: roiX, y: roiY, width: roiW, height: roiH }
     },
     getRoiAbsRect() {
@@ -269,7 +269,7 @@ export default {
       if (!video) return
       video.play().catch(() => {})
       this.videoReady = true
-      this.statusText = '未对准（请将二维码放到右上角 3×3 区域）'
+      this.statusText = '未对准（请将二维码放到右下角 3×3 区域）'
       this.startLoop()
     },
     startLoop() {
@@ -362,12 +362,12 @@ export default {
         if (this._lostCount >= LOST_FRAMES) {
           this.aligned = false
           this.alignedText = ''
-          this.statusText = '未对准（请将二维码放到右上角 3×3 区域）'
+          this.statusText = '未对准（请将二维码放到右下角 3×3 区域）'
         }
         return
       }
 
-      this.statusText = '未对准（请将二维码放到右上角 3×3 区域）'
+      this.statusText = '未对准（请将二维码放到右下角 3×3 区域）'
     },
     autoCaptureIfNeeded() {
       if (this.autoCapturing) return
