@@ -25,7 +25,8 @@
           <div class="corner br"></div>
 
           <div class="roiFrame" :style="roiFrameStyle">
-            <div class="roiLabel">二维码区域（2×2）</div>
+            <div class="scan-line"></div>
+            <div class="roiLabel">二维码区域</div>
           </div>
         </div>
       </div>
@@ -530,152 +531,202 @@ export default {
 .overlay {
   position: absolute;
   inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 10;
 }
+
+/* Gradients for readability */
 .topBar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  padding: 14px 14px 10px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0));
-  pointer-events: auto;
+  padding: 40px 24px 20px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%);
+  color: white;
+  text-align: center;
+  pointer-events: none;
 }
+
 .title {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
+
 .hint {
-  margin-top: 6px;
-  font-size: 12px;
-  opacity: 0.85;
-  line-height: 1.4;
+  margin-top: 8px;
+  font-size: 14px;
+  opacity: 0.9;
+  font-weight: 400;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
+
 .status {
-  margin-top: 10px;
-  display: inline-block;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1e293b;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .status.ok {
-  background: rgba(18, 184, 134, 0.18);
-  border-color: rgba(18, 184, 134, 0.35);
+  background: #ffffff;
+  color: #10b981;
 }
 .status.bad {
-  background: rgba(255, 95, 86, 0.18);
-  border-color: rgba(255, 95, 86, 0.35);
+  background: #ffffff;
+  color: #64748b;
 }
+
 .error {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #ffb4ae;
-  word-break: break-word;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #ef4444;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: inline-block;
 }
+
+/* Active scanning area */
 .mask {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.5) 75%);
 }
+
 .docFrame {
   position: absolute;
-  box-sizing: border-box;
+  /* border: 1px solid rgba(255,255,255,0.2); */
+  border-radius: 4px;
 }
+
 .corner {
   position: absolute;
-  width: 18px;
-  height: 18px;
-  border: 3px solid rgba(255, 255, 255, 0.9);
+  width: 24px;
+  height: 24px;
+  border: 4px solid #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
 }
-.corner.tl {
-  top: -2px;
-  left: -2px;
-  border-right: 0;
-  border-bottom: 0;
-}
-.corner.tr {
-  top: -2px;
-  right: -2px;
-  border-left: 0;
-  border-bottom: 0;
-}
-.corner.bl {
-  bottom: -2px;
-  left: -2px;
-  border-right: 0;
-  border-top: 0;
-}
-.corner.br {
-  bottom: -2px;
-  right: -2px;
-  border-left: 0;
-  border-top: 0;
-}
+
+.corner.tl { top: -2px; left: -2px; border-right: 0; border-bottom: 0; border-top-left-radius: 12px; }
+.corner.tr { top: -2px; right: -2px; border-left: 0; border-bottom: 0; border-top-right-radius: 12px; }
+.corner.bl { bottom: -2px; left: -2px; border-right: 0; border-top: 0; border-bottom-left-radius: 12px; }
+.corner.br { bottom: -2px; right: -2px; border-left: 0; border-top: 0; border-bottom-right-radius: 12px; }
+
 .roiFrame {
   position: absolute;
   box-sizing: border-box;
-  border: 2px solid rgba(255, 255, 255, 0.85);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 2000px rgba(0,0,0,0.3); /* Darken outside */
+  overflow: hidden;
 }
+
 .roiLabel {
-  position: absolute;
-  right: 6px;
-  top: 6px;
-  font-size: 11px;
-  padding: 4px 6px;
-  border-radius: 6px;
-  background: rgba(0, 0, 0, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  display: none; /* Minimalist: hide label */
 }
-.bottomBar {
+
+/* Scan Line Animation */
+.scan-line {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
-  padding: 12px 14px 18px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0));
-  pointer-events: auto;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #3b82f6, transparent);
+  box-shadow: 0 0 4px #3b82f6;
+  animation: scan 2s infinite linear;
 }
-.btn {
-  min-width: 124px;
-  height: 44px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
+
+@keyframes scan {
+  0% { top: 0; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
 }
-.btn:disabled {
-  opacity: 0.55;
-}
-.btn.secondary {
-  background: rgba(255, 255, 255, 0.08);
-}
+
 .roiPreview {
   position: absolute;
-  right: 12px;
-  top: 92px;
-  width: 200px;
-  padding: 10px 10px 12px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  right: 16px;
+  top: 120px;
+  width: 120px;
+  padding: 8px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   pointer-events: none;
+  z-index: 20;
+  opacity: 0.9;
+  transform: scale(0.9);
+  transition: opacity 0.3s;
 }
+
 .roiPreviewTitle {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 4px;
 }
+
 .roiPreviewCanvas {
-  margin-top: 8px;
-  width: 180px;
-  height: 180px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
   background: #000;
   display: block;
+}
+
+/* Bottom Actions */
+.bottomBar {
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+  pointer-events: auto;
+}
+
+.btn {
+  height: 56px;
+  padding: 0 32px;
+  border-radius: 28px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border: none;
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.btn.secondary {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  min-width: auto;
+  padding: 0 24px;
+  height: 48px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

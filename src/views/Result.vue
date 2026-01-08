@@ -65,75 +65,135 @@ export default {
 
 <style scoped>
 .page {
-  min-height: 100%;
-  padding: 14px 14px 24px;
+  min-height: 100vh;
+  padding: 20px 20px 40px;
   box-sizing: border-box;
+  background: #f8fafc;
+  color: #1e293b;
+  animation: fadeIn 0.4s ease-out;
 }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 24px;
 }
+
 .title {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #0f172a;
 }
+
 .content {
-  margin-top: 12px;
   display: grid;
+  gap: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  border: 1px solid #f1f5f9;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.value {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #334155;
+  word-break: break-all;
+  font-family: 'SF Mono', 'Roboto Mono', monospace; /* Monospace for QR data */
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.value.muted {
+  color: #94a3b8;
+  font-style: italic;
+  font-family: inherit;
+}
+
+.row {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
-.card {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  padding: 12px;
-}
-.label {
-  font-size: 12px;
-  opacity: 0.8;
-}
-.value {
-  margin-top: 8px;
-  font-size: 13px;
-  line-height: 1.45;
-  word-break: break-word;
-}
-.value.muted {
-  opacity: 0.75;
-}
-.row {
-  margin-top: 12px;
-  display: flex;
-  gap: 10px;
-}
+
 .btn {
-  height: 40px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  font: inherit;
-}
-.btn.secondary {
-  background: rgba(255, 255, 255, 0.08);
-}
-.btn:disabled {
-  opacity: 0.55;
-}
-.link {
-  display: inline-flex;
+  height: 48px;
+  display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.1);
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn.secondary {
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn.secondary:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #cbd5e1;
+}
+
+.link {
   text-decoration: none;
 }
+
 .img {
-  margin-top: 10px;
   width: 100%;
   height: auto;
   border-radius: 12px;
   display: block;
-  background: #000;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
 }
 </style>
