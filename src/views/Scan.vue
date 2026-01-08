@@ -12,7 +12,9 @@
     <div class="overlay">
       <div class="topBar">
         <div class="title">单据扫码</div>
-        <div class="hint">建议横屏拍摄：将单据完整对准 9:16 框，二维码在右下角 1.5×1.5 区域</div>
+        <div class="hint">
+          建议横屏拍摄：将单据完整对准 9:16 框，<span class="hintEm">二维码放在右下角区域</span>
+        </div>
         <div class="status" :class="{ ok: aligned, bad: !aligned }">{{ statusText }}</div>
         <div v-if="error" class="error">{{ error }}</div>
       </div>
@@ -62,7 +64,7 @@ export default {
       roiRelRect: { x: 0, y: 0, width: 0, height: 0 },
 
       aligned: false,
-      statusText: '未对准（请将二维码放到右下角 1.5×1.5 区域）',
+      statusText: '未对准（请将二维码放到右下角区域）',
       alignedText: '',
 
       _resizeObserver: null,
@@ -264,7 +266,7 @@ export default {
       if (!video) return
       video.play().catch(() => {})
       this.videoReady = true
-      this.statusText = '未对准（请将二维码放到右下角 1.5×1.5 区域）'
+      this.statusText = '未对准（请将二维码放到右下角区域）'
       this.startLoop()
     },
     startLoop() {
@@ -357,12 +359,12 @@ export default {
         if (this._lostCount >= LOST_FRAMES) {
           this.aligned = false
           this.alignedText = ''
-          this.statusText = '未对准（请将二维码放到右下角 1.5×1.5 区域）'
+          this.statusText = '未对准（请将二维码放到右下角区域）'
         }
         return
       }
 
-      this.statusText = '未对准（请将二维码放到右下角 1.5×1.5 区域）'
+      this.statusText = '未对准（请将二维码放到右下角区域）'
     },
     autoCaptureIfNeeded() {
       if (this.autoCapturing) return
@@ -471,8 +473,10 @@ export default {
   left: 0;
   right: 0;
   top: 0;
-  padding: 14px 14px 10px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.66), rgba(0, 0, 0, 0));
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 14px 12px;
+  background: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   pointer-events: auto;
 }
 .title {
@@ -481,9 +485,20 @@ export default {
 }
 .hint {
   margin-top: 6px;
-  font-size: 12px;
-  opacity: 0.85;
+  display: inline-block;
+  max-width: 100%;
+  font-size: 13px;
+  font-weight: 700;
+  opacity: 0.95;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   line-height: 1.4;
+}
+.hintEm {
+  color: rgba(0, 255, 163, 0.98);
+  font-weight: 900;
 }
 .status {
   margin-top: 10px;
@@ -550,25 +565,44 @@ export default {
 .roiFrame {
   position: absolute;
   box-sizing: border-box;
-  border: 2px solid rgba(255, 255, 255, 0.85);
-  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid rgba(0, 255, 163, 0.72);
+  background: rgba(0, 255, 163, 0.06);
+  box-shadow: 0 0 0 1px rgba(0, 255, 163, 0.18), 0 0 22px rgba(0, 255, 163, 0.12);
   overflow: hidden;
+  animation: roiPulse 1.5s ease-in-out infinite;
 }
 .scanLine {
   position: absolute;
   left: -12%;
   right: -12%;
-  height: 4px;
+  height: 7px;
   top: -12%;
   background: linear-gradient(
     90deg,
     rgba(0, 255, 163, 0),
-    rgba(0, 255, 163, 0.85),
+    rgba(0, 255, 163, 1),
     rgba(0, 255, 163, 0)
   );
-  box-shadow: 0 0 10px rgba(0, 255, 163, 0.55);
-  animation: scanLineMove 1.5s ease-in-out infinite;
+  box-shadow: 0 0 18px rgba(0, 255, 163, 0.85), 0 0 38px rgba(0, 255, 163, 0.35);
+  filter: drop-shadow(0 0 10px rgba(0, 255, 163, 0.75));
+  animation: scanLineMove 1.2s ease-in-out infinite;
   will-change: transform;
+}
+.scanLine::before {
+  content: '';
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  top: -20px;
+  height: 50px;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 255, 163, 0),
+    rgba(0, 255, 163, 0.25),
+    rgba(0, 255, 163, 0)
+  );
+  filter: blur(1px);
+  opacity: 0.9;
 }
 @keyframes scanLineMove {
   0% {
@@ -585,8 +619,19 @@ export default {
     opacity: 1;
   }
   100% {
-    transform: translateY(160%);
+    transform: translateY(240%);
     opacity: 0;
+  }
+}
+@keyframes roiPulse {
+  0% {
+    box-shadow: 0 0 0 1px rgba(0, 255, 163, 0.18), 0 0 18px rgba(0, 255, 163, 0.12);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(0, 255, 163, 0.28), 0 0 30px rgba(0, 255, 163, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 1px rgba(0, 255, 163, 0.18), 0 0 18px rgba(0, 255, 163, 0.12);
   }
 }
 .btn {
@@ -602,18 +647,20 @@ export default {
 }
 .roiPreview {
   position: absolute;
-  right: 12px;
-  top: 92px;
-  width: 200px;
-  padding: 10px 10px 12px;
+  left: 12px;
+  right: auto;
+  top: auto;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+  width: 156px;
+  padding: 8px;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.52);
   border: 1px solid rgba(255, 255, 255, 0.14);
   pointer-events: none;
 }
 .roiPreviewCanvas {
-  width: 180px;
-  height: 180px;
+  width: 140px;
+  height: 140px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: #000;
