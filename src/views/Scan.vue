@@ -597,22 +597,29 @@ export default {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, 0.5) 75%);
+  background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.7) 70%);
 }
 
 .docFrame {
   position: absolute;
-  /* border: 1px solid rgba(255,255,255,0.2); */
-  border-radius: 4px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.1);
 }
 
 .corner {
   position: absolute;
-  width: 24px;
-  height: 24px;
-  border: 4px solid #ffffff;
-  border-radius: 2px;
-  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+  width: 32px;
+  height: 32px;
+  border: 5px solid #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.4), 0 0 4px rgba(255,255,255,0.6);
+  animation: cornerPulse 2s infinite ease-in-out;
+}
+
+@keyframes cornerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 .corner.tl { top: -2px; left: -2px; border-right: 0; border-bottom: 0; border-top-left-radius: 12px; }
@@ -623,11 +630,32 @@ export default {
 .roiFrame {
   position: absolute;
   box-sizing: border-box;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 0 2000px rgba(0,0,0,0.3); /* Darken outside */
+  border: 3px solid rgba(59, 130, 246, 0.8);
+  border-radius: 12px;
+  background: rgba(59, 130, 246, 0.08);
+  box-shadow: 
+    0 0 0 2000px rgba(0,0,0,0.4),
+    0 0 20px rgba(59, 130, 246, 0.4),
+    inset 0 0 20px rgba(59, 130, 246, 0.1);
   overflow: hidden;
+  animation: roiGlow 2s infinite ease-in-out;
+}
+
+@keyframes roiGlow {
+  0%, 100% { 
+    border-color: rgba(59, 130, 246, 0.8);
+    box-shadow: 
+      0 0 0 2000px rgba(0,0,0,0.4),
+      0 0 20px rgba(59, 130, 246, 0.4),
+      inset 0 0 20px rgba(59, 130, 246, 0.1);
+  }
+  50% { 
+    border-color: rgba(59, 130, 246, 1);
+    box-shadow: 
+      0 0 0 2000px rgba(0,0,0,0.4),
+      0 0 30px rgba(59, 130, 246, 0.6),
+      inset 0 0 30px rgba(59, 130, 246, 0.15);
+  }
 }
 
 .roiLabel {
@@ -639,9 +667,9 @@ export default {
   position: absolute;
   left: 0;
   right: 0;
-  height: 2px;
-  background: linear-gradient(to right, transparent, #3b82f6, transparent);
-  box-shadow: 0 0 4px #3b82f6;
+  height: 3px;
+  background: linear-gradient(to right, transparent, #60a5fa, #3b82f6, #60a5fa, transparent);
+  box-shadow: 0 0 8px #3b82f6, 0 0 4px #60a5fa;
   animation: scan 2s infinite linear;
 }
 
