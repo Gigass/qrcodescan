@@ -1,6 +1,58 @@
 # qrcodescan (Vue2)
 
-H5 调用相机对单据扫码：页面提示 16:9 对准框，并只识别单据右上角 `2/16 × 2/9`（2格×2格、内缩一格）的二维码区域；拍照保存“以取景框中心裁剪的 20:15（4:3）截图”，结果页展示二维码内容与截图。
+H5 调用相机对单据扫码：页面提示 16:9 对准框，并只识别单据右上角 `2/16 × 2/9`（2 格 ×2 格、内缩一格）的二维码区域；拍照保存“以取景框中心裁剪的 20:15（4:3）截图”，结果页展示二维码内容与截图。
+
+## 环境准备 (Node.js & npm)
+
+本项目依赖 Node.js 环境，请确保您的电脑已安装 Node.js (推荐 v16+)。
+
+### 1. 安装 Node.js
+
+#### Windows 用户
+
+1. 访问 [Node.js 中文网](https://nodejs.org/zh-cn/download/) 下载 `LTS` (长期支持版) 安装包。
+2. 双击安装包，一路点击 "Next" 完成安装。
+3. 打开命令行 (Win+R -> cmd)，输入 `node -v` 检查是否安装成功。
+
+#### Mac 用户
+
+推荐使用 `brew` 安装 (需先安装 [Homebrew](https://brew.sh/)):
+
+```bash
+brew install node
+```
+
+或者直接下载安装包：[Node.js 官网下载](https://nodejs.org/en/download/)
+
+### 2. 配置国内镜像源 (加速下载)
+
+由于 npm 官方源在国外，国内访问速度较慢，强烈建议配置国内镜像源（如淘宝/腾讯镜像）。
+
+**方式一：使用 nrm 管理镜像源 (推荐)**
+
+```bash
+# 不需要 sudo (Mac/Linux 如果报错 EACCES 权限问题，请在命令前加 sudo)
+npm install -g nrm
+
+# 查看可用源
+nrm ls
+
+# 切换到淘宝源
+nrm use taobao
+```
+
+**方式二：直接命令配置**
+
+```bash
+# 设置淘宝源
+npm config set registry https://registry.npmmirror.com
+
+# 验证配置
+npm config get registry
+# 输出应为: https://registry.npmmirror.com/
+```
+
+---
 
 ## 运行
 
@@ -13,30 +65,30 @@ npm run serve
 
 ## 本地测试（手机）
 
-1) 电脑与手机在同一 Wi‑Fi 下。
-2) 用电脑浏览器打开 devServer 的地址确认可访问。
-3) 手机上用 `https://<电脑局域网IP>:5173/scan` 打开。
+1. 电脑与手机在同一 Wi‑Fi 下。
+2. 用电脑浏览器打开 devServer 的地址确认可访问。
+3. 手机上用 `https://<电脑局域网IP>:5173/scan` 打开。
 
 > 注意：移动端浏览器通常要求 HTTPS 才能调用相机权限；如果是自签证书，可能需要手动信任。
 
 ## 本地 HTTPS（推荐 mkcert）
 
-1) 安装 mkcert 并初始化本机根证书（只需一次）。
+1. 安装 mkcert 并初始化本机根证书（只需一次）。
 
-2) 在项目根目录创建证书文件（示例：给 `localhost` 和你的局域网 IP 签发）：
+2. 在项目根目录创建证书文件（示例：给 `localhost` 和你的局域网 IP 签发）：
 
 ```bash
 mkcert -key-file certs/dev.key -cert-file certs/dev.crt localhost 127.0.0.1 ::1 192.168.1.23
 ```
 
-3) 创建 `.env.local`（可从 `.env.local.example` 复制）：
+3. 创建 `.env.local`（可从 `.env.local.example` 复制）：
 
 ```bash
 SSL_KEY_FILE=certs/dev.key
 SSL_CRT_FILE=certs/dev.crt
 ```
 
-4) 启动：
+4. 启动：
 
 ```bash
 npm run serve
