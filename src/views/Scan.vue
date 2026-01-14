@@ -597,7 +597,7 @@ export default {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.7) 70%);
+  /* 移除背景遮罩，因为 .roiFrame 的 box-shadow 已经提供了足够的视觉区分 */
 }
 
 .docFrame {
@@ -632,9 +632,9 @@ export default {
   box-sizing: border-box;
   border: 3px solid rgba(59, 130, 246, 0.8);
   border-radius: 12px;
-  background: rgba(59, 130, 246, 0.08);
+  background: rgba(59, 130, 246, 0.05);
   box-shadow: 
-    0 0 0 2000px rgba(0,0,0,0.4),
+    0 0 0 2000px rgba(0,0,0,0.15),
     0 0 20px rgba(59, 130, 246, 0.4),
     inset 0 0 20px rgba(59, 130, 246, 0.1);
   overflow: hidden;
@@ -645,14 +645,14 @@ export default {
   0%, 100% { 
     border-color: rgba(59, 130, 246, 0.8);
     box-shadow: 
-      0 0 0 2000px rgba(0,0,0,0.4),
+      0 0 0 2000px rgba(0,0,0,0.15),
       0 0 20px rgba(59, 130, 246, 0.4),
       inset 0 0 20px rgba(59, 130, 246, 0.1);
   }
   50% { 
     border-color: rgba(59, 130, 246, 1);
     box-shadow: 
-      0 0 0 2000px rgba(0,0,0,0.4),
+      0 0 0 2000px rgba(0,0,0,0.15),
       0 0 30px rgba(59, 130, 246, 0.6),
       inset 0 0 30px rgba(59, 130, 246, 0.15);
   }
