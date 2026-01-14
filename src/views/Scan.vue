@@ -47,10 +47,9 @@ import jsQR from 'jsqr'
 import { captureStore } from '../state/captureStore'
 import { mapDisplayRectToVideoRectCover } from '../utils/videoMapping'
 
-const SCAN_INTERVAL_MS = 160
+const SCAN_INTERVAL_MS = 100  // 降低扫描间隔，增加采样机会
 const ROI_CANVAS_SIZE = 960
-const STABLE_FRAMES = 3
-const LOST_FRAMES = 5
+const LOCK_TIMEOUT_MS = 400   // 锁定后的拍照倒计时
 const CAPTURE_FRAME_EXPAND = 1.5
 const CAPTURE_ASPECT_W = 20
 const CAPTURE_ASPECT_H = 15
@@ -76,11 +75,14 @@ export default {
       _raf: 0,
       _lastScanAt: 0,
       _candidateText: '',
-      _candidateCount: 0,
-      _lostCount: 0,
       _lastRoiVideoRect: null,
       _roiCanvas: null,
       _roiCtx: null,
+      // 锁定模式相关
+      _lockMode: false,        // 是否进入锁定模式
+      _lockText: '',           // 锁定时的二维码内容
+      _lockTimer: null,        // 锁定倒计时器
+      _confirmCount: 0,        // 锁定期间再次识别到相同内容的次数
     }
   },
   computed: {
@@ -113,6 +115,7 @@ export default {
     this.stopLoop()
     this.stopCamera()
     this.disconnectResize()
+    this.clearLockTimer()
   },
   methods: {
     setupCanvases() {
@@ -359,53 +362,82 @@ export default {
         })
       }
 
+      // === 锁定模式逻辑 ===
+      // 如果已经在锁定模式中，不更新状态显示，只检查是否再次识别到相同内容
+      if (this._lockMode) {
+        if (result && result.data && String(result.data) === this._lockText) {
+          this._confirmCount += 1
+          // 如果确认次数达到2次，立即拍照（提前结束倒计时）
+          if (this._confirmCount >= 2) {
+            this.clearLockTimer()
+            this.executeCapture()
+          }
+        }
+        // 锁定模式下，无论是否识别到，都不更新状态文字
+        return
+      }
+
+      // === 正常扫描逻辑 ===
       if (result && result.data) {
         const text = String(result.data)
-        if (text === this._candidateText) this._candidateCount += 1
-        else {
-          this._candidateText = text
-          this._candidateCount = 1
-        }
-        this._lostCount = 0
-
-        if (this._candidateCount >= STABLE_FRAMES) {
-          this.aligned = true
-          this.alignedText = this._candidateText
-          this.statusText = '已对准（自动拍照中…）'
-          this.autoCaptureIfNeeded()
-        } else {
-          this.aligned = false
-          this.alignedText = ''
-          this.statusText = '识别中…（请保持稳定）'
+        
+        // 首次识别到二维码，立即进入锁定模式
+        if (!this._lockMode) {
+          this.enterLockMode(text)
         }
         return
       }
 
+      // 未识别到二维码，显示未对准状态
       this._candidateText = ''
-      this._candidateCount = 0
-      if (this.aligned) {
-        this._lostCount += 1
-        if (this._lostCount >= LOST_FRAMES) {
-          this.aligned = false
-          this.alignedText = ''
-          this.statusText = '未对准（请将二维码放到右上角 2×2 区域）'
-        }
-        return
-      }
-
       this.statusText = '未对准（请将二维码放到右上角 2×2 区域）'
     },
-    autoCaptureIfNeeded() {
+    // 进入锁定模式
+    enterLockMode(text) {
+      if (this._lockMode) return
+      
+      this._lockMode = true
+      this._lockText = text
+      this._confirmCount = 0
+      this.aligned = true
+      this.alignedText = text
+      this.statusText = '识别成功，拍照中…'
+      
+      // 启动倒计时，到时即拍照
+      this._lockTimer = window.setTimeout(() => {
+        this.executeCapture()
+      }, LOCK_TIMEOUT_MS)
+    },
+    
+    // 清除锁定计时器
+    clearLockTimer() {
+      if (this._lockTimer) {
+        window.clearTimeout(this._lockTimer)
+        this._lockTimer = null
+      }
+    },
+    
+    // 退出锁定模式（重置状态）
+    exitLockMode() {
+      this.clearLockTimer()
+      this._lockMode = false
+      this._lockText = ''
+      this._confirmCount = 0
+      this.aligned = false
+      this.alignedText = ''
+      this.autoCapturing = false
+    },
+    
+    // 执行拍照
+    executeCapture() {
       if (this.autoCapturing) return
+      if (!this.videoReady) {
+        this.exitLockMode()
+        this.statusText = '相机未就绪，请重试'
+        return
+      }
       this.autoCapturing = true
-      // Small delay to reduce motion blur at the moment alignment is detected.
-      window.setTimeout(() => {
-        if (!this.videoReady || !this.aligned) {
-          this.autoCapturing = false
-          return
-        }
-        this.capture()
-      }, 220)
+      this.capture()
     },
     capture() {
       const video = this.$refs.video
@@ -504,7 +536,7 @@ export default {
     restart() {
       this.stopLoop()
       this.stopCamera()
-      this.autoCapturing = false
+      this.exitLockMode()
       this.startCamera()
     },
   },
