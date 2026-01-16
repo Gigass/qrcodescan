@@ -12,7 +12,7 @@
     <div class="overlay">
       <div class="topBar">
         <div class="title">单据扫码</div>
-        <div class="hint">将单据完整对准 16:9 框，二维码在右上角 2×2 区域</div>
+        <div class="hint">将单据完整对准 16:9 框，二维码在右上角区域</div>
         <div class="status" :class="{ ok: aligned, bad: !aligned }">{{ statusText }}</div>
         <div v-if="error" class="error">{{ error }}</div>
       </div>
@@ -68,7 +68,7 @@ export default {
       roiRelRect: { x: 0, y: 0, width: 0, height: 0 },
 
       aligned: false,
-      statusText: '未对准（请将二维码放到右上角 2×2 区域）',
+      statusText: '未对准（请将二维码放到右上角区域）',
       alignedText: '',
 
       _resizeObserver: null,
@@ -162,10 +162,16 @@ export default {
 
       this.docRect = { x: docX, y: docY, width: docW, height: docH }
 
-      const roiW = docW * (2 / 16)
-      const roiH = docH * (2 / 9)
-      const roiX = docW * (12 / 16)  // 最佳位置：75%
-      const roiY = docH * (1 / 9)
+      // 缩小识别框 (原 2x2 -> 1.4x1.4)，保持中心位置约为 (13, 2)
+      // 1.4 / 16 = 0.0875
+      const roiW = docW * (1.4 / 16)
+      // 1.4 / 9 = 0.1555
+      const roiH = docH * (1.4 / 9)
+      
+      // Center X = 13. New X = 13 - 1.4/2 = 12.3
+      const roiX = docW * (12.3 / 16)
+      // Center Y = 2. New Y = 2 - 1.4/2 = 1.3
+      const roiY = docH * (1.3 / 9)
       this.roiRelRect = { x: roiX, y: roiY, width: roiW, height: roiH }
     },
     getRoiAbsRect() {
@@ -298,7 +304,7 @@ export default {
       if (!video) return
       video.play().catch(() => {})
       this.videoReady = true
-      this.statusText = '未对准（请将二维码放到右上角 2×2 区域）'
+      this.statusText = '未对准（请将二维码放到右上角区域）'
       this.startLoop()
     },
     startLoop() {
@@ -390,7 +396,7 @@ export default {
 
       // 未识别到二维码，显示未对准状态
       this._candidateText = ''
-      this.statusText = '未对准（请将二维码放到右上角 2×2 区域）'
+      this.statusText = '未对准（请将二维码放到右上角区域）'
     },
     // 进入锁定模式
     enterLockMode(text) {
